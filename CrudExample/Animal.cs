@@ -218,6 +218,7 @@ namespace CrudExample
             DateTime deathDate = ValidateDateTimeInput("Fecha de Muerte (AAAA-MM-DD HH:MM:SS): ");
 
             Animal animal = new Animal(name, description, birthdate, lifeExpectancy, aggressive, gender, deathDate);
+            //animales.Add(animal);
             animales.Add(animal);
             Console.WriteLine("Animal agregado con éxito.");
             animal.PrintAttributes();
