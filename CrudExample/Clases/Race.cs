@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CrudExample
+namespace CrudExample.Clases
 {
-    internal class Race : Animal
+    internal class Race 
     {
-        public Race(string name, string description, DateOnly birthdate, TimeOnly lifeExpectancy, bool aggressive, char gender, DateTime deathDate) : base(name, description, birthdate, lifeExpectancy, aggressive, gender, deathDate)
-        {
-        }
+
 
         //public Race(int id, string nombre, string description, DateOnly birthdate, TimeOnly lifeExpectancy, bool aggressive, char gender, DateTime deathDate) : base(id, nombre, description, birthdate, lifeExpectancy, aggressive, gender, deathDate)
         //{
