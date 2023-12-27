@@ -1,12 +1,24 @@
-﻿using CrudExample;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Xml.Linq;
-Console.WriteLine("Application CRUD");
-Animal animal = new Animal(default, default, default, default, default, default, default);
-animal.PublicAddDataTest();
+﻿using CrudExample.Clases;
+using CrudExample.GetData;
+using CrudExample.Repositories;
+using CrudExample.Services;
+using CrudExample.Validations;
+using Microsoft.Extensions.DependencyInjection;
 
+Console.WriteLine("Example application CRUD");
+var serviceProvider = new ServiceCollection()
+              .AddTransient<IAnimalRepository, AnimalRepository>()
+              .AddTransient<IInputValidation, InputValidation>()
+              .AddTransient<IGetDataFromUser<Animal>, AnimalData>()
+              .AddTransient<AnimalService>()
+              .BuildServiceProvider();
+
+var _animalService = serviceProvider.GetService<AnimalService>();
+var _animalRepository = serviceProvider.GetService<IAnimalRepository>();
+var _animalData = serviceProvider.GetService<IGetDataFromUser<Animal>>();
+var _input = serviceProvider.GetService<IInputValidation>();
+//Animal data test.
+_animalService.DataTest();
 
 while (true)
 {
@@ -16,39 +28,48 @@ while (true)
     Console.WriteLine("3. Actualizar Animales");
     Console.WriteLine("4. Eliminar Animales");
     Console.WriteLine("5. Salir");
-    int option = OptionValidate();
+    int option = _input.OptionValidate();
 
     switch (option)
     {
 
         case 1:
-            animal.PublicAddAnimal();
+            Animal animalFromUser = _animalData.GetDataFromUser();
+            _animalService.AddAnimal(animalFromUser);
+            _animalService.PrintAnimal(animalFromUser);
+            Console.WriteLine("Animal agregado con exito. \n");
+            Console.ReadKey();
+
             break;
         case 2:
-            animal.PublicListAnimal();
+            List<Animal> listAnimals = _animalService.ListAnimals();
+            Console.WriteLine(_animalService.PrintAllAnimals(listAnimals));
             break;
         case 3:
             Console.WriteLine("Ingrese un ID del animal para actualizar: ");
-            int optionUpdateAnimal = OptionValidate();
-            animal.PublicUpdateAnimal(optionUpdateAnimal);
-            //Console.WriteLine("Animal eliminado correctamente ");
+             int idAnimalUpdated = _input.OptionValidate();
+            _animalService.GetAnimal(idAnimalUpdated);
+            Animal animalUpdatedFromUser = _animalData.GetDataFromUser();
+            _animalService.UpdatedAnimal(animalUpdatedFromUser);
             break;
         case 4:
             Console.WriteLine("Ingrese una opcion: ");
             Console.WriteLine("1. Eliminar un animal ");
             Console.WriteLine("2. Eliminar todos los animales ");
-            int optionResult = OptionValidate();
-            if (optionResult == 1)
+            int optionDelete = _input.OptionValidate();
+
+            if (optionDelete == 1)
             {
                 Console.WriteLine("Ingrese un ID del animal a eliminar: ");
-                int optionSearchAnimal = OptionValidate();
-                animal.PublicDeleteAnimal(optionSearchAnimal);
+                int idAnimalDelete = _input.OptionValidate();
+                _animalService.GetAnimal(idAnimalDelete);
+                _animalService.DeleteAnimal(idAnimalDelete);
                 Console.WriteLine("Animal eliminado correctamente ");
                 break;
             }
-            else if (optionResult == 2)
+            else if (optionDelete == 2)
             {
-                animal.PublicClearList();
+                _animalService.ClearList();
                 Console.WriteLine("Lista de animales limpiados ");
                 break;
             }
@@ -63,32 +84,5 @@ while (true)
         default:
             Console.WriteLine("Opción no válida. Intente nuevamente.");
             break;
-    }
-}
-int OptionValidate()
-{
-    string optionInput = Console.ReadLine();
-    if (!string.IsNullOrEmpty(optionInput) && int.TryParse(optionInput, out int valorEntero))
-    {
-        return valorEntero;
-    }
-    else
-    {
-        return -1;
-    }
-}
-string ValidateConfirmation()
-{
-    while (true)
-    {
-        string input = Console.ReadLine().Trim().ToLower();
-        if (!string.IsNullOrWhiteSpace(input) && (input == "si" || input == "no"))
-        {
-            return input;
-        }
-        else
-        {
-            Console.WriteLine("Entrada no válida. Por favor, escribe 'Si' o 'No': ");
-        }
     }
 }
